@@ -1,6 +1,7 @@
 var models = require('../../models/index');
 var express = require('express');
 var router = express.Router();
+var moment = require('moment');
 
 router.all('/', function(req, res, next) {
   var page = req.query.page || 1;
@@ -17,6 +18,12 @@ router.all('/', function(req, res, next) {
     include: [{ all: true }]
   }).then(function (events) {
     if (events) {
+      for (var i = 0; i < events.length; i++) {
+        events[i].dataValues.event_datetime = moment(events[i].event_datetime).format("YYYY-MM-DD HH:mm:ss");
+        events[i].dataValues.depart_datetime = moment(events[i].depart_datetime).format("YYYY-MM-DD HH:mm:ss");
+        events[i].dataValues.cdate = moment(events[i].cdate).format("YYYY-MM-DD HH:mm:ss");
+      }
+
       var startIdx = (page - 1) * count;
       var endIdx = page * count;
 
