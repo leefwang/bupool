@@ -13,13 +13,21 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
-    url: {
+    event_datetime: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    depart_datetime: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    image_url: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    event_datetime: {
-      type: DataTypes.DATE,
-      allowNull: false,
+    starting_point_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     cdate: {
       type: DataTypes.DATE,
