@@ -2,7 +2,7 @@ var models = require('../../models/index');
 var express = require('express');
 var router = express.Router();
 
-router.post('/request', function(req, res, next) {
+router.all('/request', function(req, res, next) {
   var courseRequest = models.course_requests.build({
     event_id: req.query.event_id,
     destination_id: req.query.destination_id,
