@@ -27,10 +27,10 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         CourseRequests.hasOne(models.starting_points, {
-          foreignKey: 'starting_point_id'
+          foreignKey: 'id'
         });
         CourseRequests.hasOne(models.destinations, {
-          foreignKey: 'destination_id'
+          foreignKey: 'id'
         });
         CourseRequests.belongsTo(models.users, {
           foreignKey: 'user_id'
