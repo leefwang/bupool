@@ -24,6 +24,7 @@ router.all('/', function(req, res, next) {
     }
 
     res.json({
+      result: 1,
       events: events.slice(startIdx, endIdx),
       page: page,
       total_page: totalPage

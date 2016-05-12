@@ -10,6 +10,7 @@ router.all('/:id', function(req, res, next) {
     }
   }).then(function (startingPoint) {
     res.json({
+      result: 1,
       startingPoint: startingPoint
     });
   });
