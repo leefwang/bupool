@@ -2,7 +2,7 @@ var models = require('../../models/index');
 var express = require('express');
 var router = express.Router();
 
-router.get('/', function(req, res, next) {
+router.post('/', function(req, res, next) {
   var page = req.query.page || 1;
   var count = req.query.count || 20;
 
