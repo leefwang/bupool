@@ -9,7 +9,6 @@ router.all('/', function(req, res, next) {
       id: req.query.userId
     }
   }).then(function (ticket) {
-    delete ticket.keys("user");
     res.json({
       result: 1,
       ticket: ticket
