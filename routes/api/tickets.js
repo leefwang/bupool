@@ -6,7 +6,7 @@ router.all('/', function(req, res, next) {
   models.tickets.findOne({
     include: [{ all: true }],
     where: {
-      id: req.query.userId
+      user_id: req.query.userId
     }
   }).then(function (ticket) {
     res.json({
