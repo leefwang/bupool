@@ -1,9 +1,9 @@
-var models = require('../../models/index');
+var models = require('../../models');
 var express = require('express');
 var router = express.Router();
 
 router.all('/', function(req, res, next) {
-  models.tickets.findOne({
+  models.tickets.findAll({
     include: [{ all: true }],
     where: {
       user_id: req.query.userId
