@@ -58,23 +58,9 @@ router.all('/signup', function(req, res, next) {
       });
 
       user.save().then(function() {
-        var device = models.devices.build({
-          user_id: user.id,
-          device: req.body.udid,
-          platform: req.body.platform
-        });
-
-        device.save().then(function() {
-          return res.json({
-            result: 1,
-            user: user,
-            device: device
-          });
-        }).catch(function(err) {
-          return res.json({
-            result: 0,
-            err: err
-          });
+        return res.json({
+          result: 1,
+          user: user
         });
       }).catch(function(err) {
         return res.json({
