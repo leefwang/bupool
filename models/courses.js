@@ -4,20 +4,16 @@ var models = require('../models');
 var moment = require('moment');
 
 module.exports = function(sequelize, DataTypes) {
-  var CourseRequests = sequelize.define('course_requests', {
-    course_id: {
+  var Courses = sequelize.define('courses', {
+    event_id: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    destination_id: {
+    course_detail_id: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    is_used: {
+    flag: {
       type: DataTypes.ENUM('Y','N'),
       allowNull: false,
       defaultValue: 'N'
@@ -31,21 +27,10 @@ module.exports = function(sequelize, DataTypes) {
     freezeTableName: true, // Model tableName will be the same as the model name
     classMethods: {
       associate: function(models) {
-        CourseRequests.hasOne(models.starting_points, {
-          foreignKey: 'id'
-        });
-        CourseRequests.hasOne(models.starting_points, {
-          foreignKey: 'id'
-        });
-        CourseRequests.hasOne(models.destinations, {
-          foreignKey: 'id'
-        });
-        CourseRequests.belongsTo(models.users, {
-          foreignKey: 'user_id'
-        });
+
       }
     }
   });
 
-  return CourseRequests;
+  return Courses;
 };
