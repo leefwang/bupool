@@ -17,6 +17,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
+    is_admin: {
+      type: DataTypes.STRING,
+      defaultValue: 'N'
+    },
     cdate: {
       type: DataTypes.DATE,
       allowNull: false,
