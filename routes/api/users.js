@@ -10,17 +10,30 @@ router.all('/signin', function(req, res, next) {
   }).then(function (user) {
     if (user) {
       if (user.password === req.body.password) {
-        if (user.is_admin === 'Y') {
+        models.devices.findOne({
+          where: {
+            device: req.body.udid
+          }
+        }).then(function (device) {
+          if (user.is_admin === 'Y') {
+            return res.json({
+              result: 4,
+              user: user,
+              device: device
+            });
+          } else {
+            return res.json({
+              result: 1,
+              user: user,
+              device: device
+            });
+          }
+        }).catch(function(err) {
           return res.json({
-            result: 4,
-            user: user
+            result: 0,
+            err: err
           });
-        } else {
-          return res.json({
-            result: 1,
-            user: user
-          });
-        }
+        });
       } else {
         return res.json({
           result: 3
