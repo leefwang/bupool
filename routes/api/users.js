@@ -13,14 +13,12 @@ router.all('/signin', function(req, res, next) {
         if (user.is_admin === 'Y') {
           return res.json({
             result: 4,
-            user: user,
-            device: device
+            user: user
           });
         } else {
           return res.json({
             result: 1,
-            user: user,
-            device: device
+            user: user
           });
         }
       } else {
