@@ -9,6 +9,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    destination_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false
@@ -23,7 +27,10 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         Tickets.belongsTo(models.users, {
-          foreignKey: 'id'
+          foreignKey: 'user_id'
+        });
+        Tickets.belongsTo(models.destinations, {
+          foreignKey: 'destination_id'
         });
         Tickets.belongsTo(models.courses, {
           foreignKey: 'course_id'
