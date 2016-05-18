@@ -37,7 +37,11 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     freezeTableName: true, // Model tableName will be the same as the model name
     classMethods: {
-
+      associate: function(models) {
+        Events.belongsTo(models.starting_points, {
+          foreignKey: 'starting_point_id'
+        });
+      }
     }
   });
 

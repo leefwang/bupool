@@ -4,7 +4,15 @@ var router = express.Router();
 
 router.all('/', function(req, res, next) {
   models.tickets.findAll({
-    include: [{ all: true }],
+    include: [{
+      model: models.courses,
+      include: [{
+        model: models.events,
+        include: [{
+          model: models.starting_points
+        }]
+      }]
+    }],
     where: {
       user_id: req.query.userId
     }

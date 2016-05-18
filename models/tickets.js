@@ -23,7 +23,10 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         Tickets.belongsTo(models.users, {
-          foreignKey: 'user_id'
+          foreignKey: 'id'
+        });
+        Tickets.belongsTo(models.courses, {
+          foreignKey: 'course_id'
         });
       }
     }
