@@ -22,7 +22,7 @@ router.all('/', function(req, res, next) {
           model: models.destinations
         }],
         where: {
-          user_id: req.body.userId
+          user_id: user.id
         }
       }).then(function (tickets) {
         if (tickets.length > 0) {

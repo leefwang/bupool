@@ -34,7 +34,7 @@ router.all('/request', function(req, res, next) {
         var courseRequest = models.course_requests.build({
           course_id: courseId,
           destination_id: req.body.destination_id,
-          user_id: req.body.userId
+          user_id: user.id
         });
 
         courseRequest.save().then(function() {
