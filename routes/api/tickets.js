@@ -12,15 +12,24 @@ router.all('/', function(req, res, next) {
           model: models.starting_points
         }]
       }]
+    },{
+      model: models.destinations
     }],
     where: {
       user_id: req.body.userId
     }
-  }).then(function (ticket) {
-    res.json({
-      result: 1,
-      ticket: ticket
-    });
+  }).then(function (tickets) {
+    if (tickets.length > 0) {
+      res.json({
+        result: 1,
+        tickets: tickets
+      });
+    } else {
+      res.json({
+        result: 0,
+        tickets: tickets
+      });
+    }
   });
 });
 
