@@ -21,7 +21,7 @@ router.all('/put', function(req, res, next) {
         if (user) {
           var device = models.devices.build({
             user_id: user.id,
-            device: req.body.udid,
+            device: req.body.device,
             token: req.body.deviceToken,
             platform: req.body.platform
           });
