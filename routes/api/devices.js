@@ -5,7 +5,7 @@ var router = express.Router();
 router.all('/put', function(req, res, next) {
   models.devices.findOne({
     where: {
-      device: req.body.udid
+      device: req.body.device
     }
   }).then(function (device) {
     if (device) {
