@@ -15,11 +15,17 @@ module.exports = function(sequelize, DataTypes) {
     },
     event_datetime: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      get: function() {
+        return moment(this.getDataValue('cdate')).format("YYYY-MM-DD HH:mm:ss");
+      }
     },
     depart_datetime: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      get: function() {
+        return moment(this.getDataValue('cdate')).format("YYYY-MM-DD HH:mm:ss");
+      }
     },
     image_url: {
       type: DataTypes.STRING,
@@ -32,7 +38,10 @@ module.exports = function(sequelize, DataTypes) {
     cdate: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: moment()
+      defaultValue: moment(),
+      get: function() {
+        return moment(this.getDataValue('cdate')).format("YYYY-MM-DD HH:mm:ss");
+      }
     }
   }, {
     freezeTableName: true, // Model tableName will be the same as the model name
