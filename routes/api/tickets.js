@@ -14,7 +14,7 @@ router.all('/', function(req, res, next) {
       }]
     }],
     where: {
-      user_id: req.query.userId
+      user_id: req.body.userId
     }
   }).then(function (ticket) {
     res.json({
