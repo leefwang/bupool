@@ -74,7 +74,7 @@ router.all('/push', function(req, res, next) {
     }
   });
 
-  var server_access_key = '푸시 프로바이더 서버 access key 값';
+  var server_access_key = 'AIzaSyCU71ywHf21rf1QXGjcaBzKO5TKKNr96fw';
   var sender = new gcm.Sender(server_access_key);
   var registrationIds = [];
 
