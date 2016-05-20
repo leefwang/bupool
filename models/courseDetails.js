@@ -17,6 +17,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    required_time: {
+      type: DataTypes.TIME,
+      allowNull: false
+    },
     cdate: {
       type: DataTypes.DATE,
       allowNull: false,

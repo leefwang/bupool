@@ -13,6 +13,9 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
+    scheme: {
+      type: DataTypes.STRING
+    },
     cdate: {
       type: DataTypes.DATE,
       allowNull: false,
