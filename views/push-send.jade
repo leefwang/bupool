@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  .container
+    .col-sm-12
+      form.form-horizontal(role='form', action='/push/send', method='POST')
+        .panel.panel-default.row
+          .panel-heading
+            h1.panel-title push send
+          .panel-body
+            .row
+              label.col-sm-4 title
+              label.col-sm-2 &nbsp;
+              label.col-sm-5 message
+            each item in pushMessages
+              .row
+                label.col-sm-4 #{item.title}
+                label.col-sm-2 &nbsp;
+                label.col-sm-5 #{item.message}
+                label
+                  a(href='/api/push/send?id=#{item.id}') push 보내기
+          .panel-footer
