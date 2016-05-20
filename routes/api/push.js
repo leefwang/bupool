@@ -3,12 +3,16 @@ var express = require('express');
 var router = express.Router();
 
 router.all('/send', function(req, res, next) {
+  var push;
+
   models.push_messages.findOne({
     include: [{ all: true }],
     where : {
       id: req.query.id
     }
-  }).then(function (pushMessages) {
+  }).then(function (pushMessage) {
+    push = pushMessage;
+
     models.devices.findAll({
 
     }).then(function (devices) {
@@ -20,8 +24,8 @@ router.all('/send', function(req, res, next) {
         delayWhileIdle: true,
         timeToLive: 3,
         data: {
-          title: push_messages.title,
-          message: push_messages.message
+          title: push.title,
+          message: push.message
         }
       });
 
@@ -35,6 +39,9 @@ router.all('/send', function(req, res, next) {
 
       sender.send(message, registrationIds, 4, function (err, result) {
         console.log(result);
+        return res.json({
+          result: 1
+        })
       });
     });
   });
