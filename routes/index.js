@@ -15,4 +15,15 @@ router.get('/push', function(req, res, next) {
   });
 });
 
+router.get('/ticket', function(req, res, next) {
+  models.course_requests.findAll({
+    include: [{ all: true }],
+    where: {
+      is_used: 'N'
+    }
+  }).then(function (courseRequests) {
+    res.render('ticket', {courseRequests: courseRequests});
+  });
+});
+
 module.exports = router;
