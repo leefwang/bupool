@@ -17,6 +17,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    members: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
+    },
     is_used: {
       type: DataTypes.ENUM('Y','N'),
       allowNull: false,

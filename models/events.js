@@ -23,6 +23,7 @@ module.exports = function(sequelize, DataTypes) {
     depart_datetime: {
       type: DataTypes.DATE,
       allowNull: false,
+      defaultValue: '0000-00-00 00:00:00',
       get: function() {
         return moment(this.getDataValue('cdate')).format("YYYY-MM-DD HH:mm:ss");
       }

@@ -13,6 +13,14 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    min_members: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    max_members: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     flag: {
       type: DataTypes.ENUM('Y','N'),
       allowNull: false,

@@ -13,6 +13,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
+    scheme: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     cdate: {
       type: DataTypes.DATE,
       allowNull: false,
