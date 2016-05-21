@@ -3,11 +3,15 @@ var express = require('express');
 var router = express.Router();
 
 router.all('/request', function(req, res, next) {
+  var requestUser;
+
   models.users.findOne({
     where: {
       email: req.body.email
     }
   }).then(function (user) {
+    requestUser = user;
+
     models.courses.findAll({
       where: {
         event_id: req.body.event_id
@@ -34,7 +38,7 @@ router.all('/request', function(req, res, next) {
         var courseRequest = models.course_requests.build({
           course_id: courseId,
           destination_id: req.body.destination_id,
-          user_id: user.id
+          user_id: requestUser.id
         });
 
         courseRequest.save().then(function() {
