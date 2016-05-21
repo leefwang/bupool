@@ -4,6 +4,7 @@ var router = express.Router();
 
 router.all('/request', function(req, res, next) {
   var requestUser;
+  var requestCourses;
 
   models.users.findOne({
     where: {
@@ -17,6 +18,8 @@ router.all('/request', function(req, res, next) {
         event_id: req.body.event_id
       }
     }).then(function (courses) {
+      requestCourses = courses;
+
       models.course_details.findAll({
         where: {
           destination_id: req.body.destination_id
@@ -24,15 +27,15 @@ router.all('/request', function(req, res, next) {
       }).then(function (courseDetails) {
         var courseId = 0;
 
-        for (var i = 0; i < courses.length; i++) {
+        for (var i = 0; i < requestCourses.length; i++) {
           for (var j = 0; j < courseDetails.length; j++) {
             console.log("detail: " + courseDetails[j].course_id);
-            if (courses[i].id === courseDetails[j].course_id) {
-              courseId = courses[i].id;
+            if (requestCourses[i].id === courseDetails[j].course_id) {
+              courseId = requestCourses[i].id;
               break;
             }
           }
-          console.log("course: " + courses[i].id);
+          console.log("course: " + requestCourses[i].id);
         }
 
         var courseRequest = models.course_requests.build({
