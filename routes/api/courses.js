@@ -5,6 +5,7 @@ var router = express.Router();
 router.all('/request', function(req, res, next) {
   var requestUser;
   var requestCourses;
+  var requestCourseDetails;
 
   if (req.body.members > 4) {
     res.json({
@@ -32,6 +33,7 @@ router.all('/request', function(req, res, next) {
           destination_id: req.body.destination_id
         }
       }).then(function (courseDetails) {
+        var requestCourseDetails = courseDetails;
         var courseId = 0;
 
         for (var i = 0; i < requestCourses.length; i++) {
@@ -45,20 +47,45 @@ router.all('/request', function(req, res, next) {
           console.log("course: " + requestCourses[i].id);
         }
 
-        var courseRequest = models.course_requests.build({
-          course_id: courseId,
-          destination_id: req.body.destination_id,
-          user_id: requestUser.id
-        });
+        models.course_requests.findOne({
+          include: [{
+            model: models.courses,
+            where: {
+              event_id: req.body.event_id
+            }
+          }],
+          where: {
+            user_id: requestUser.id
+          }
+        }).then(function (courseRequests) {
+          if (courseRequests) {
+            courseRequests.update({
+              course_id: courseId,
+              destination_id: req.body.destination_id,
+              members: req.body.members
+            }, {fields: ['course_id', 'destination_id', 'members']}).then(function() {
+              res.json({
+                result: 2
+              });
+            });
+          } else {
+            var courseRequest = models.course_requests.build({
+              course_id: courseId,
+              destination_id: req.body.destination_id,
+              user_id: requestUser.id,
+              members: req.body.members
+            });
 
-        courseRequest.save().then(function() {
-          res.json({
-            result: 1
-          });
-        }).catch(function() {
-          res.json({
-            result: 0
-          });
+            courseRequest.save().then(function() {
+              res.json({
+                result: 1
+              });
+            }).catch(function() {
+              res.json({
+                result: 0
+              });
+            });
+          }
         });
       });
     });
