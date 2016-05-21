@@ -6,6 +6,13 @@ router.all('/request', function(req, res, next) {
   var requestUser;
   var requestCourses;
 
+  if (req.body.members > 4) {
+    res.json({
+      result: 0,
+      err: 'The number of members is too large.'
+    });
+  }
+
   models.users.findOne({
     where: {
       email: req.body.email
