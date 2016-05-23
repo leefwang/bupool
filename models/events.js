@@ -36,6 +36,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    status: {
+      type: DataTypes.ENUM('active','inactive', 'end'),
+      allowNull: false,
+      defaultValue: 'active'
+    },
     cdate: {
       type: DataTypes.DATE,
       allowNull: false,
