@@ -34,6 +34,12 @@ module.exports = function(sequelize, DataTypes) {
       get: function() {
         return moment(this.getDataValue('cdate')).format("YYYY-MM-DD HH:mm:ss");
       }
+    },
+    udate: {
+      type: DataTypes.DATE,
+      get: function () {
+        return moment(this.getDataValue('udate')).format("YYYY-MM-DD HH:mm:ss");
+      }
     }
   }, {
     freezeTableName: true, // Model tableName will be the same as the model name

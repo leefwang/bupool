@@ -11,16 +11,18 @@ block content
             label.col-sm-2 course_id
             label.col-sm-2 destination_id
             label.col-sm-2 user_id
+            label.col-sm-2 members
           each item in courseRequests
             .row
               label.col-sm-2 #{item.course_id}
               label.col-sm-2 #{item.destination_id}
               label.col-sm-2 #{item.user_id}
+              label.col-sm-2 #{item.members}
         .panel-footer
           .row.well.well-sm
-            form.form-horizontal(role='form', action="/api/tickets/ticketing", method='POST')
+            form.form-horizontal(role='form', action="/ticket", method='POST')
               .form-group
-                label.col-sm-1.control-label(for='cid') 경로 ID
+                label.col-sm-1.control-label(for='cid') 이벤트 ID
                 .col-sm-2
-                  input#cid.form-control(type='text', name='cid')
+                  input#cid.form-control(type='text', name='eid')
               button.btn.btn-default.pull-right(type='submit') 발권

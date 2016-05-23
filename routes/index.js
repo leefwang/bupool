@@ -19,10 +19,23 @@ router.get('/ticket', function(req, res, next) {
   models.course_requests.findAll({
     include: [{ all: true }],
     where: {
-      is_used: 'N'
+      status: 'requested'
     }
   }).then(function (courseRequests) {
     res.render('ticket', {courseRequests: courseRequests});
+  });
+});
+
+router.post('/ticket', function(req, res, next) {
+  var request = require('request');
+  var url = 'http://localhost:3000/api/tickets/ticketing';
+
+  request.post(url, {json: true, body: req.body}, function(err, response, body) {
+    if (!err && response.statusCode === 200) {
+      return res.redirect('/ticket');
+    } else {
+      return res.redirect('/ticket');
+    }
   });
 });
 

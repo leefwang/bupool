@@ -23,8 +23,7 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: 1
     },
     arrival_datetime: {
-      type: DataTypes.DATE,
-      allowNull: false
+      type: DataTypes.DATE
     },
     cdate: {
       type: DataTypes.DATE,
