@@ -129,6 +129,18 @@ router.all('/ticketing', function(req, res, next) {
       });
     });
 
+    models.events.findOne({
+      where: {
+        id: req.body.eid
+      }
+    }).then(function(event) {
+      event.update({
+        status: "end"
+      }, {fields: ['status']}).then(function() {
+
+      });
+    });
+
     return res.json({
       result: 1
     });
