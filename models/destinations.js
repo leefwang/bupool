@@ -32,7 +32,11 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     freezeTableName: true, // Model tableName will be the same as the model name
     classMethods: {
-
+      associate: function(models) {
+        Destinations.belongsTo(models.course_details, {
+          foreignKey: 'id'
+        });
+      }
     }
   });
 
