@@ -1,49 +1,51 @@
 var models = require('../../models');
+var utils = require('../../utils');
 var express = require('express');
 var router = express.Router();
 
 router.all('/send', function(req, res, next) {
   var push;
+  var courseId = req.query.course_id || '';
+  var destinationId = req.query.destination_id || '';
 
   models.push_messages.findOne({
     include: [{ all: true }],
     where : {
-      id: req.query.id
+      id: req.query.push_id
     }
   }).then(function (pushMessage) {
     push = pushMessage;
 
-    models.devices.findAll({
-
-    }).then(function (devices) {
-      var gcm = require('node-gcm');
-      var fs = require('fs');
-
-      var message = new gcm.Message({
-        collapseKey: 'demo',
-        delayWhileIdle: true,
-        timeToLive: 3,
-        data: {
-          title: push.title,
-          message: push.message
+    if (courseId !== '' && destinationId !== '') {
+      models.tickets.findAll({
+        include: [{
+          model: models.users,
+          include: [{
+            model: models.devices
+          }]
+        }],
+        where: {
+          course_id: courseId,
+          destination_id: destinationId
         }
+      }).then(function (tickets) {
+        var devices = [];
+
+        for (var i = 0; i < tickets.length; i++) {
+          for (var j = 0; j < tickets[i].user.devices.length; j++ ) {
+            devices.push(tickets[i].user.devices[j]);
+          }
+        }
+
+        utils.sendPush(push, devices);
       });
+    } else {
+      models.devices.findAll({
 
-      var server_api_key = 'AIzaSyCU71ywHf21rf1QXGjcaBzKO5TKKNr96fw';
-      var sender = new gcm.Sender(server_api_key);
-      var registrationIds = [];
-
-      for (var i = 0; i < devices.length; i++) {
-        registrationIds.push(devices[i].token);
-      }
-
-      sender.send(message, registrationIds, 4, function (err, result) {
-        console.log(result);
-        return res.json({
-          result: 1
-        })
+      }).then(function (devices) {
+        utils.sendPush(push, devices);
       });
-    });
+    }
   });
 });
 

@@ -1,6 +1,27 @@
 extends layout
 
 block content
+  script(type='text/javascript').
+    $(function () {
+      $('#course').change(function () {
+        $.ajax({
+          url: '/api/courses/details',
+          method: 'POST',
+          data: {
+            course_id: $('#course option:selected').val()
+          },
+          dataType: 'json',
+          success: function (data) {
+            $('#destination').empty();
+
+            for (var i = 0; i < data.courseDetails.length; i++) {
+              $('#destination').append($("<option></option>").attr("value", data.courseDetails[i].destination.id).text(data.courseDetails[i].destination.name));
+            }
+          }
+        }); // $.ajax
+      });
+    });
+
   .container
     .col-sm-12
       form.form-horizontal(role='form', action='/push/send', method='POST')
@@ -9,14 +30,28 @@ block content
             h1.panel-title push send
           .panel-body
             .row
-              label.col-sm-4 title
-              label.col-sm-2 &nbsp;
+              label.col-sm-2 title
+              label.col-sm-4 &nbsp;
               label.col-sm-5 message
             each item in pushMessages
               .row
-                label.col-sm-4 #{item.title}
-                label.col-sm-2 &nbsp;
-                label.col-sm-5 #{item.message}
-                label
-                  a(href='/api/push/send?id=#{item.id}') push 보내기
+                form(action='/api/push/send')
+                  label.col-sm-2 #{item.title}
+                  if (item.scheme === '3')
+                    .col-sm-2
+                      select#course.form-control(name='course_id')
+                        option(value='') course_id
+                        if (courses)
+                          each item in courses
+                            option(value=item.id) #{item.id}
+                    .col-sm-2
+                      select#destination.form-control(name='destination_id')
+                        option(value='') 목적지
+
+                  else
+                    label.col-sm-4 &nbsp;
+                  label.col-sm-5 #{item.message}
+                  label
+                    button(type='submit') push 보내기
+                  input(type='hidden', name='push_id', value='#{item.id}')
           .panel-footer

@@ -1,4 +1,5 @@
 var models = require('../../models');
+var utils = require('../../utils');
 var express = require('express');
 var router = express.Router();
 var moment = require('moment');
@@ -62,6 +63,12 @@ router.all('/ticketing', function(req, res, next) {
       var courseOfEvent = course;
 
       models.course_requests.findAll({
+        include: [{
+          model: models.users,
+          include: [{
+            model: models.devices
+          }]
+        }],
         where: {
           course_id: courseOfEvent.id,
           status: 'requested'
@@ -81,7 +88,16 @@ router.all('/ticketing', function(req, res, next) {
               members: courseRequest.members
             });
 
-            ticket.save();
+            ticket.save().then(function() {
+              models.push_messages.findOne({
+                include: [{ all: true }],
+                where : {
+                  scheme: '1'
+                }
+              }).then(function(pushMessage) {
+                utils.sendPush(pushMessage, courseRequest.user.devices);
+              });
+            });
 
             courseRequest.update({
               status: 'ticketed'
@@ -90,15 +106,18 @@ router.all('/ticketing', function(req, res, next) {
             });
 
             sumMembers += courseRequest.members;
-            console.log("cid : ");
-            console.log(courseRequest.course_id);
-            console.log("total : ");
-            console.log(sumMembers);
           } else {
             courseRequest.update({
               status: 'rejected'
             }, {fields: ['status']}).then(function() {
-
+              models.push_messages.findOne({
+                include: [{ all: true }],
+                where : {
+                  scheme: '4'
+                }
+              }).then(function(pushMessage) {
+                utils.sendPush(pushMessage, courseRequest.user.devices);
+              });
             });
           }
         });

@@ -96,4 +96,18 @@ router.all('/request', function(req, res, next) {
   });
 });
 
+router.all('/details', function(req, res, next) {
+  models.course_details.findAll({
+    include: [{ all: true }],
+    where: {
+      course_id: req.body.course_id
+    }
+  }).then(function (courseDetails) {
+    res.json({
+      result: 1,
+      courseDetails: courseDetails
+    });
+  });
+});
+
 module.exports = router;

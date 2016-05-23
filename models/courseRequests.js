@@ -25,7 +25,7 @@ module.exports = function(sequelize, DataTypes) {
     status: {
       type: DataTypes.ENUM('requested','ticketed', 'rejected'),
       allowNull: false,
-      defaultValue: 'N'
+      defaultValue: 'requested'
     },
     cdate: {
       type: DataTypes.DATE,

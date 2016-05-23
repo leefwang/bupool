@@ -8,10 +8,18 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/push', function(req, res, next) {
+  var messages;
+
   models.push_messages.findAll({
     include: [{ all: true }]
   }).then(function (pushMessages) {
-    res.render('push-send', {pushMessages: pushMessages});
+    messages = pushMessages;
+
+    models.courses.findAll({
+
+    }).then(function (courses) {
+      res.render('push-send', {pushMessages: messages, courses: courses});
+    });
   });
 });
 

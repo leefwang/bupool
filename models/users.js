@@ -36,6 +36,12 @@ module.exports = function(sequelize, DataTypes) {
         Users.hasMany(models.course_requests, {
           foreignKey: 'user_id'
         });
+        Users.hasMany(models.devices, {
+          foreignKey: 'user_id'
+        });
+        Users.hasMany(models.tickets, {
+          foreignKey: 'user_id'
+        });
       }
     }
   });
