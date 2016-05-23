@@ -19,7 +19,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     members: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      defaultValue: 1
     },
     is_used: {
       type: DataTypes.ENUM('Y','N'),
@@ -41,8 +42,8 @@ module.exports = function(sequelize, DataTypes) {
         CourseRequests.hasOne(models.starting_points, {
           foreignKey: 'id'
         });
-        CourseRequests.hasOne(models.starting_points, {
-          foreignKey: 'id'
+        CourseRequests.belongsTo(models.courses, {
+          foreignKey: 'course_id'
         });
         CourseRequests.hasOne(models.destinations, {
           foreignKey: 'id'
