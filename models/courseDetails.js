@@ -21,6 +21,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TIME,
       allowNull: false
     },
+    required_time_sum: {
+      type: DataTypes.TIME,
+      allowNull: false
+    },
     cdate: {
       type: DataTypes.DATE,
       allowNull: false,

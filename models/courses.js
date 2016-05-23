@@ -41,6 +41,9 @@ module.exports = function(sequelize, DataTypes) {
         Courses.belongsTo(models.events, {
           foreignKey: 'event_id'
         });
+        Courses.hasMany(models.course_details, {
+          foreignKey: 'course_id'
+        });
       }
     }
   });

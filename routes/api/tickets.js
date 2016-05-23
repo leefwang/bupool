@@ -20,6 +20,8 @@ router.all('/', function(req, res, next) {
             include: [{
               model: models.starting_points
             }]
+          },{
+            model: models.course_details
           }]
         },{
           model: models.destinations
