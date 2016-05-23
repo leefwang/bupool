@@ -23,6 +23,9 @@ router.all('/', function(req, res, next) {
           }]
         },{
           model: models.destinations
+        },{
+          model: models.users,
+          attributes: ['phone']
         }],
         where: {
           user_id: user.id
