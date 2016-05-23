@@ -22,8 +22,8 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 1
     },
-    is_used: {
-      type: DataTypes.ENUM('Y','N'),
+    status: {
+      type: DataTypes.ENUM('requested','ticketed', 'rejected'),
       allowNull: false,
       defaultValue: 'N'
     },
