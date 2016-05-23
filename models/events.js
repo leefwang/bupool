@@ -17,7 +17,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DATE,
       allowNull: false,
       get: function() {
-        return moment(this.getDataValue('cdate')).format("YYYY-MM-DD HH:mm:ss");
+        return moment(this.getDataValue('event_datetime')).format("YYYY-MM-DD HH:mm:ss");
       }
     },
     depart_datetime: {
@@ -25,7 +25,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       defaultValue: '0000-00-00 00:00:00',
       get: function() {
-        return moment(this.getDataValue('cdate')).format("YYYY-MM-DD HH:mm:ss");
+        return moment(this.getDataValue('depart_datetime')).format("YYYY-MM-DD HH:mm:ss");
       }
     },
     image_url: {
