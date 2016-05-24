@@ -28,6 +28,14 @@ module.exports = function(sequelize, DataTypes) {
         return moment(this.getDataValue('depart_datetime')).format("YYYY-MM-DD HH:mm:ss");
       }
     },
+    deadline_datetime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: '0000-00-00 00:00:00',
+      get: function() {
+        return moment(this.getDataValue('deadline_datetime')).format("YYYY-MM-DD HH:mm:ss");
+      }
+    },
     image_url: {
       type: DataTypes.STRING,
       allowNull: false
