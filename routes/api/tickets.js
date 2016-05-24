@@ -73,73 +73,105 @@ router.all('/', function(req, res, next) {
 });
 
 router.all('/ticketing', function(req, res, next) {
+  var busCount = 0;
+
   models.courses.findAll({
     where: {
       event_id: req.body.eid
     }
   }).then(function (courses) {
+    var minMembersMinus = 0;
 
-    async.each(courses, function (course) {
-      var courseOfEvent = course;
+    while(busCount < 10 && minMembersMinus < 15) {
+      async.each(courses, function (course) {
+        var courseOfEvent = course;
 
-      models.course_requests.findAll({
-        include: [{
-          model: models.users,
-          include: [{
-            model: models.devices
-          }]
-        }],
-        where: {
-          course_id: courseOfEvent.id,
-          status: 'requested'
-        },
-        order: [
-          ['udate', 'ASC']
-        ]
-      }).then(function (courseRequests) {
-        var sumMembers = 0;
+        models.course_requests.sum('members', { where: { course_id: courseOfEvent.id, status: 'requested' }}).then(function(sum) {
+          if(sum > courseOfEvent.min_members - minMembersMinus) {
+            models.course_requests.findAll({
+              include: [{
+                model: models.users,
+                include: [{
+                  model: models.devices
+                }]
+              }],
+              where: {
+                course_id: courseOfEvent.id,
+                status: 'requested'
+              },
+              order: [
+                ['udate', 'ASC']
+              ]
+            }).then(function (courseRequests) {
+              var sumMembers = 0;
 
-        async.each(courseRequests, function (courseRequest) {
-          if (sumMembers + courseRequest.members <= courseOfEvent.max_members) {
-            var ticket = models.tickets.build({
-              course_id: courseRequest.course_id,
-              destination_id: courseRequest.destination_id,
-              user_id: courseRequest.user_id,
-              members: courseRequest.members
-            });
+              async.each(courseRequests, function (courseRequest) {
+                if (sumMembers + courseRequest.members <= courseOfEvent.max_members) {
+                  var ticket = models.tickets.build({
+                    course_id: courseRequest.course_id,
+                    destination_id: courseRequest.destination_id,
+                    user_id: courseRequest.user_id,
+                    members: courseRequest.members
+                  });
 
-            ticket.save().then(function() {
-              models.push_messages.findOne({
-                include: [{ all: true }],
-                where : {
-                  scheme: '1'
+                  ticket.save().then(function() {
+                    models.push_messages.findOne({
+                      include: [{ all: true }],
+                      where : {
+                        scheme: '1'
+                      }
+                    }).then(function(pushMessage) {
+                      utils.sendPush(pushMessage, courseRequest.user.devices);
+                    });
+                  });
+
+                  courseRequest.update({
+                    status: 'ticketed'
+                  }, {fields: ['status']}).then(function() {
+
+                  });
+
+                  sumMembers += courseRequest.members;
                 }
-              }).then(function(pushMessage) {
-                utils.sendPush(pushMessage, courseRequest.user.devices);
               });
-            });
-
-            courseRequest.update({
-              status: 'ticketed'
-            }, {fields: ['status']}).then(function() {
 
             });
 
-            sumMembers += courseRequest.members;
-          } else {
-            courseRequest.update({
-              status: 'rejected'
-            }, {fields: ['status']}).then(function() {
-              models.push_messages.findOne({
-                include: [{ all: true }],
-                where : {
-                  scheme: '4'
-                }
-              }).then(function(pushMessage) {
-                utils.sendPush(pushMessage, courseRequest.user.devices);
-              });
-            });
+            busCount++;
           }
+        });
+      });
+
+      minMembersMinus += 5;
+    }
+
+    models.course_requests.findAll({
+      include: [{
+        model: models.users,
+        include: [{
+          model: models.devices
+        }]
+      }],
+      where: {
+        course_id: courseOfEvent.id,
+        status: 'requested'
+      },
+      order: [
+        ['udate', 'ASC']
+      ]
+    }).then(function (courseRequests) {
+      async.each(courseRequests, function (courseRequest) {
+        courseRequest.update({
+          status: 'rejected'
+        }, {fields: ['status']}).then(function() {
+          models.push_messages.findOne({
+            include: [{ all: true }],
+            where : {
+              scheme: '2'
+            }
+          }).then(function(pushMessage) {
+            utils.sendPush(pushMessage, courseRequest.user.devices);
+          });
         });
       });
     });
