@@ -5,8 +5,8 @@ var router = express.Router();
 
 router.all('/send', function(req, res, next) {
   var push;
-  var courseId = req.query.course_id || '';
-  var destinationId = req.query.destination_id || '';
+  var courseId = req.body.course_id || '';
+  var destinationId = req.body.destination_id || '';
 
   models.push_messages.findOne({
     include: [{ all: true }],
@@ -38,12 +38,14 @@ router.all('/send', function(req, res, next) {
         }
 
         utils.sendPush(push, devices);
+        res.redirect('/push');
       });
     } else {
       models.devices.findAll({
 
       }).then(function (devices) {
         utils.sendPush(push, devices);
+        res.redirect('/push');
       });
     }
   });

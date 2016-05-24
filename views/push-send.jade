@@ -24,34 +24,33 @@ block content
 
   .container
     .col-sm-12
-      form.form-horizontal(role='form', action='/push/send', method='POST')
-        .panel.panel-default.row
-          .panel-heading
-            h1.panel-title push send
-          .panel-body
+      .panel.panel-default.row
+        .panel-heading
+          h1.panel-title push send
+        .panel-body
+          .row
+            label.col-sm-2 title
+            label.col-sm-4 &nbsp;
+            label.col-sm-5 message
+          each item in pushMessages
             .row
-              label.col-sm-2 title
-              label.col-sm-4 &nbsp;
-              label.col-sm-5 message
-            each item in pushMessages
-              .row
-                form(action='/api/push/send')
-                  label.col-sm-2 #{item.title}
-                  if (item.scheme === '3')
-                    .col-sm-2
-                      select#course.form-control(name='course_id')
-                        option(value='') course_id
-                        if (courses)
-                          each item in courses
-                            option(value=item.id) #{item.id}
-                    .col-sm-2
-                      select#destination.form-control(name='destination_id')
-                        option(value='') 목적지
+              form(action='/api/push/send')
+                label.col-sm-2 #{item.title}
+                if (item.scheme === '3')
+                  .col-sm-2
+                    select#course.form-control(name='course_id')
+                      option(value='') course_id
+                      if (courses)
+                        each item in courses
+                          option(value=item.id) #{item.id}
+                  .col-sm-2
+                    select#destination.form-control(name='destination_id')
+                      option(value='') 목적지
 
-                  else
-                    label.col-sm-4 &nbsp;
-                  label.col-sm-5 #{item.message}
-                  label
-                    button(type='submit') push 보내기
-                  input(type='hidden', name='push_id', value='#{item.id}')
-          .panel-footer
+                else
+                  label.col-sm-4 &nbsp;
+                label.col-sm-5 #{item.message}
+                label
+                  button(type='submit') push 보내기
+                input(type='hidden', name='push_id', value='#{item.id}')
+        .panel-footer
