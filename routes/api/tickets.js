@@ -6,47 +6,62 @@ var moment = require('moment');
 var async = require('async');
 
 router.all('/', function(req, res, next) {
+  var ticketUser;
+
   models.users.findOne({
     where: {
       email: req.body.email
     }
   }).then(function (user) {
-    if (user) {
-      models.tickets.findAll({
-        include: [{
-          model: models.courses,
-          include: [{
-            model: models.events,
-            include: [{
-              model: models.starting_points
-            }]
-          },{
-            model: models.course_details
-          }]
-        },{
-          model: models.destinations
-        },{
-          model: models.users,
-          attributes: ['phone']
-        }],
-        where: {
-          user_id: user.id
-        }
-      }).then(function (tickets) {
-        if (tickets.length > 0) {
-          for (var i = 0; i < tickets.length; i++) {
-            tickets[i].course.event.depart_datetime = moment(tickets[i].course.event.depart_datetime).format("YYYY-MM-DD HH:mm:ss");
-          }
+    ticketUser = user;
 
+    if (ticketUser) {
+      models.course_requests.findOne({
+        where: {
+          user_id: ticketUser.id,
+          status: 'requested'
+        }
+      }).then(function (courseRequest) {
+        if (courseRequest) {
           res.json({
-            result: 1,
-            tickets: tickets
+            result: 2,
+            courseRequest: courseRequest
           });
         } else {
-          res.json({
-            result: 0,
-            tickets: tickets
+          models.tickets.findAll({
+            include: [{
+              model: models.courses,
+              include: [{
+                model: models.events,
+                include: [{
+                  model: models.starting_points
+                }]
+              },{
+                model: models.course_details
+              }]
+            },{
+              model: models.destinations
+            },{
+              model: models.users,
+              attributes: ['phone']
+            }],
+            where: {
+              user_id: ticketUser.id
+            }
+          }).then(function (tickets) {
+            if (tickets.length > 0) {
+              res.json({
+                result: 1,
+                tickets: tickets
+              });
+            } else {
+              res.json({
+                result: 0,
+                tickets: tickets
+              });
+            }
           });
+
         }
       });
     } else {
