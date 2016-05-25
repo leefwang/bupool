@@ -45,14 +45,11 @@ module.exports = function(sequelize, DataTypes) {
     freezeTableName: true, // Model tableName will be the same as the model name
     classMethods: {
       associate: function(models) {
-        CourseRequests.hasOne(models.starting_points, {
-          foreignKey: 'id'
-        });
         CourseRequests.belongsTo(models.courses, {
           foreignKey: 'course_id'
         });
-        CourseRequests.hasOne(models.destinations, {
-          foreignKey: 'id'
+        CourseRequests.belongsTo(models.destinations, {
+          foreignKey: 'destination_id'
         });
         CourseRequests.belongsTo(models.users, {
           foreignKey: 'user_id'
