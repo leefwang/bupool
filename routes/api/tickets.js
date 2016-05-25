@@ -73,7 +73,7 @@ router.all('/', function(req, res, next) {
 });
 
 router.all('/ticketing', function(req, res, next) {
-  var busCount = 0;
+  var busCount = req.body.bcnt;
 
   models.courses.findAll({
     where: {
@@ -82,7 +82,7 @@ router.all('/ticketing', function(req, res, next) {
   }).then(function (courses) {
     var minMembersMinus = 0;
 
-    while(busCount < 10 && minMembersMinus < 15) {
+    while(busCount > 0 && minMembersMinus < 15) {
       async.each(courses, function (course) {
         var courseOfEvent = course;
 
@@ -137,7 +137,7 @@ router.all('/ticketing', function(req, res, next) {
 
             });
 
-            busCount++;
+            busCount--;
           }
         });
       });
