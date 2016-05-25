@@ -51,6 +51,6 @@ block content
                   label.col-sm-4 &nbsp;
                 label.col-sm-5 #{item.message}
                 label
-                  button(type='submit') push 보내기
+                  button(type='submit', onClick='alert("푸시가 발송되었습니다.")') push 보내기
                 input(type='hidden', name='push_id', value='#{item.id}')
         .panel-footer
