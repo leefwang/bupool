@@ -4,6 +4,7 @@ var express = require('express');
 var router = express.Router();
 var moment = require('moment');
 var async = require('async');
+var Q = require('q');
 
 router.all('/', function(req, res, next) {
   var ticketUser;
@@ -73,125 +74,207 @@ router.all('/', function(req, res, next) {
 });
 
 router.all('/ticketing', function(req, res, next) {
-  var busCount = req.body.bcnt;
+  var busCount = req.body.bcnt || 0;
+  var minMembersMinus = req.body.mmembers || 0;
 
   models.courses.findAll({
     where: {
       event_id: req.body.eid
     }
   }).then(function (courses) {
-    var minMembersMinus = 0;
 
-    while(busCount > 0 && minMembersMinus < 15) {
-      async.each(courses, function (course) {
-        var courseOfEvent = course;
+    var promises = courses.map(function (course, cb) {
+      var courseOfEvent = course;
 
-        models.course_requests.sum('members', { where: { course_id: courseOfEvent.id, status: 'requested' }}).then(function(sum) {
-          if(sum > courseOfEvent.min_members - minMembersMinus) {
-            models.course_requests.findAll({
+      models.course_requests.sum('members', { where: { course_id: courseOfEvent.id, status: 'requested' }}).then(function(sum) {
+        if(busCount > 0 && sum > courseOfEvent.min_members - minMembersMinus) {
+          models.course_requests.findAll({
+            include: [{
+              model: models.users,
               include: [{
-                model: models.users,
-                include: [{
-                  model: models.devices
-                }]
-              }],
-              where: {
-                course_id: courseOfEvent.id,
-                status: 'requested'
-              },
-              order: [
-                ['udate', 'ASC']
-              ]
-            }).then(function (courseRequests) {
-              var sumMembers = 0;
+                model: models.devices
+              }]
+            }],
+            where: {
+              course_id: courseOfEvent.id,
+              status: 'requested'
+            },
+            order: [
+              ['udate', 'ASC']
+            ]
+          }).then(function (courseRequests) {
+            var sumMembers = 0;
 
-              async.each(courseRequests, function (courseRequest) {
-                if (sumMembers + courseRequest.members <= courseOfEvent.max_members) {
-                  var ticket = models.tickets.build({
-                    course_id: courseRequest.course_id,
-                    destination_id: courseRequest.destination_id,
-                    user_id: courseRequest.user_id,
-                    members: courseRequest.members
+            async.each(courseRequests, function (courseRequest) {
+              if (sumMembers + courseRequest.members <= courseOfEvent.max_members) {
+                var ticket = models.tickets.build({
+                  course_id: courseRequest.course_id,
+                  destination_id: courseRequest.destination_id,
+                  user_id: courseRequest.user_id,
+                  members: courseRequest.members
+                });
+
+                ticket.save().then(function() {
+                  models.push_messages.findOne({
+                    include: [{ all: true }],
+                    where : {
+                      scheme: '1'
+                    }
+                  }).then(function(pushMessage) {
+                    //utils.sendPush(pushMessage, courseRequest.user.devices);
                   });
+                });
 
-                  ticket.save().then(function() {
-                    models.push_messages.findOne({
-                      include: [{ all: true }],
-                      where : {
-                        scheme: '1'
-                      }
-                    }).then(function(pushMessage) {
-                      utils.sendPush(pushMessage, courseRequest.user.devices);
-                    });
-                  });
+                courseRequest.update({
+                  status: 'ticketed'
+                }, {fields: ['status']}).then(function() {
 
-                  courseRequest.update({
-                    status: 'ticketed'
-                  }, {fields: ['status']}).then(function() {
+                });
 
-                  });
-
-                  sumMembers += courseRequest.members;
-                }
-              });
-
+                sumMembers += courseRequest.members;
+              }
+            }, function() {
+              cb();
             });
 
-            busCount--;
-          }
-        });
-      });
-
-      minMembersMinus += 5;
-    }
-
-    models.course_requests.findAll({
-      include: [{
-        model: models.users,
-        include: [{
-          model: models.devices
-        }]
-      }],
-      where: {
-        course_id: courseOfEvent.id,
-        status: 'requested'
-      },
-      order: [
-        ['udate', 'ASC']
-      ]
-    }).then(function (courseRequests) {
-      async.each(courseRequests, function (courseRequest) {
-        courseRequest.update({
-          status: 'rejected'
-        }, {fields: ['status']}).then(function() {
-          models.push_messages.findOne({
-            include: [{ all: true }],
-            where : {
-              scheme: '2'
-            }
-          }).then(function(pushMessage) {
-            utils.sendPush(pushMessage, courseRequest.user.devices);
           });
+
+          busCount--;
+          console.log(busCount);
+
+        }
+      });
+    });
+
+    // Wait for all promises to be resolved
+    Q.all(promises)
+      .then(
+        function () { // all is well!
+          cb();
+        },
+        function (err) { // something bad happened!
+          cb(err);
+        }
+      );
+
+    // async.each(courses, function (course, cb) {
+    //   var courseOfEvent = course;
+    //
+    //   models.course_requests.sum('members', { where: { course_id: courseOfEvent.id, status: 'requested' }}).then(function(sum) {
+    //     if(busCount > 0 && sum > courseOfEvent.min_members - minMembersMinus) {
+    //       models.course_requests.findAll({
+    //         include: [{
+    //           model: models.users,
+    //           include: [{
+    //             model: models.devices
+    //           }]
+    //         }],
+    //         where: {
+    //           course_id: courseOfEvent.id,
+    //           status: 'requested'
+    //         },
+    //         order: [
+    //           ['udate', 'ASC']
+    //         ]
+    //       }).then(function (courseRequests) {
+    //         var sumMembers = 0;
+    //
+    //         async.each(courseRequests, function (courseRequest) {
+    //           if (sumMembers + courseRequest.members <= courseOfEvent.max_members) {
+    //             var ticket = models.tickets.build({
+    //               course_id: courseRequest.course_id,
+    //               destination_id: courseRequest.destination_id,
+    //               user_id: courseRequest.user_id,
+    //               members: courseRequest.members
+    //             });
+    //
+    //             ticket.save().then(function() {
+    //               models.push_messages.findOne({
+    //                 include: [{ all: true }],
+    //                 where : {
+    //                   scheme: '1'
+    //                 }
+    //               }).then(function(pushMessage) {
+    //                 //utils.sendPush(pushMessage, courseRequest.user.devices);
+    //               });
+    //             });
+    //
+    //             courseRequest.update({
+    //               status: 'ticketed'
+    //             }, {fields: ['status']}).then(function() {
+    //
+    //             });
+    //
+    //             sumMembers += courseRequest.members;
+    //           }
+    //         }, function() {
+    //           cb();
+    //         });
+    //
+    //       });
+    //
+    //       busCount--;
+    //       console.log(busCount);
+    //
+    //     }
+    //   });
+    // }, function () {
+    //   console.log(busCount);
+    //   // res.json({
+    //   //   result: 1,
+    //   //   busCount: req.body.bcnt - busCount
+    //   // });
+    // });
+  });
+});
+
+router.all('/reject', function(req, res, next) {
+  models.course_requests.findAll({
+    include: [{
+      model: models.users,
+      include: [{
+        model: models.devices
+      }]
+    }],
+    where: {
+      status: 'requested'
+    },
+    order: [
+      ['udate', 'ASC']
+    ]
+  }).then(function (courseRequests) {
+    async.each(courseRequests, function (courseRequest) {
+      courseRequest.update({
+        status: 'rejected'
+      }, {fields: ['status']}).then(function() {
+        models.push_messages.findOne({
+          include: [{ all: true }],
+          where : {
+            scheme: '2'
+          }
+        }).then(function(pushMessage) {
+          utils.sendPush(pushMessage, courseRequest.user.devices);
         });
       });
-    });
-
-    models.events.findOne({
-      where: {
-        id: req.body.eid
-      }
-    }).then(function(event) {
-      event.update({
-        status: "end"
-      }, {fields: ['status']}).then(function() {
-
-      });
-    });
-
-    return res.json({
-      result: 1
+    }, function () {
+      res.redirect('/ticket');
     });
   });
 });
+
+router.all('/end', function(req, res, next) {
+  models.events.findOne({
+    where: {
+      id: req.body.eid
+    }
+  }).then(function(event) {
+    event.update({
+      status: "end"
+    }, {fields: ['status']}).then(function() {
+      res.redirect('/ticket');
+    });
+  });
+});
+
 
 module.exports = router;

@@ -20,13 +20,29 @@ block content
               label.col-sm-2 #{item.members}
         .panel-footer
           .row.well.well-sm
-            form.form-horizontal(role='form', action="/ticket", method='POST')
+            form.form-horizontal(role='form', action="/api/tickets/ticketing", method='POST')
               .form-group
-                label.col-sm-1.control-label(for='cid') 이벤트 ID
+                label.col-sm-2.control-label 이벤트 ID
                 .col-sm-2
-                  input#cid.form-control(type='text', name='eid')
+                  input.form-control(type='text', name='eid')
               .form-group
-                label.col-sm-1.control-label(for='bcnt') 버스 수
+                label.col-sm-2.control-label(for='bcnt') 버스 수
                 .col-sm-2
                   input#bcnt.form-control(type='text', name='bcnt')
+              .form-group
+                label.col-sm-2.control-label(for='mmembers') 줄일 최소인원 수
+                .col-sm-2
+                  input#mmembers.form-control(type='text', name='mmembers')
+              if (busCount)
+                label.col-sm-2.control-label(for='mmembers') #{busCount}대의 버스가 생성되었습니다.
               button.btn.btn-default.pull-right(type='submit') 발권
+          .row.well.well-sm
+            form.form-horizontal(role='form', action="/api/tickets/reject", method='POST')
+              button.btn.btn-default.pull-right(type='submit') 남은 요청 거절
+          .row.well.well-sm
+            form.form-horizontal(role='form', action="/api/tickets/end", method='POST')
+              .form-group
+                label.col-sm-2.control-label 이벤트 ID
+                .col-sm-2
+                  input.form-control(type='text', name='eid')
+              button.btn.btn-default.pull-right(type='submit') 이벤트 종료

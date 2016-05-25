@@ -1,6 +1,7 @@
 var models = require('../models');
 var express = require('express');
 var router = express.Router();
+var async = require('async');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -30,7 +31,7 @@ router.get('/ticket', function(req, res, next) {
       status: 'requested'
     }
   }).then(function (courseRequests) {
-    res.render('ticket', {courseRequests: courseRequests});
+    res.render('ticket', {courseRequests: courseRequests, busCount: req.query.busCount});
   });
 });
 
@@ -40,9 +41,27 @@ router.post('/ticket', function(req, res, next) {
 
   request.post(url, {json: true, body: req.body}, function(err, response, body) {
     if (!err && response.statusCode === 200) {
-      return res.redirect('/ticket');
+      return res.redirect('/ticket?busCount', + response.busCount);
     } else {
       return res.redirect('/ticket');
+    }
+  });
+});
+
+router.get('/test', function(req, res, next) {
+  var arr = [1, 2, 3];
+
+  async.each(arr, function(num, callback) {
+    console.log('num : ' + num);
+
+    console.log('File processed');
+    callback();
+  }, function(err){
+    if( err ) {
+      console.log('A file failed to process');
+    } else {
+      console.log('All files have been processed successfully');
+      res.render('error');
     }
   });
 });
