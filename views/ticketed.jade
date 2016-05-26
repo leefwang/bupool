@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  .container
+    .col-sm-12
+      .panel.panel-default.row
+        .panel-heading
+          h1.panel-title 경로 요청
+        .panel-body
+          .row
+            label.col-sm-2 코스 id
+            label.col-sm-4 목적지
+            label.col-sm-2 핸드폰 번호
+            label.col-sm-2 인원
+          each item in tickets
+            .row
+              label.col-sm-2 #{item.course_id}
+              label.col-sm-4 #{item.destination.name}
+              label.col-sm-2 #{item.user.phone}
+              label.col-sm-2 #{item.members}
+        .panel-footer
+

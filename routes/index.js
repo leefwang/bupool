@@ -35,4 +35,18 @@ router.get('/ticket', function(req, res, next) {
   });
 });
 
+router.get('/ticketed', function(req, res, next) {
+  models.tickets.findAll({
+    include: [
+      { model: models.users },
+      { model: models.destinations }
+    ],
+    order: [
+      ['course_id', 'ASC']
+    ]
+  }).then(function (tickets) {
+    res.render('ticketed', {tickets: tickets});
+  });
+});
+
 module.exports = router;
