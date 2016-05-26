@@ -124,7 +124,7 @@ router.all('/ticketing', function(req, res, next) {
                         scheme: '1'
                       }
                     }).then(function(pushMessage) {
-                      //utils.sendPush(pushMessage, courseRequest.user.devices);
+                      utils.sendPush(pushMessage, courseRequest.user.devices);
                     });
                   });
 
