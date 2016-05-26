@@ -35,35 +35,4 @@ router.get('/ticket', function(req, res, next) {
   });
 });
 
-router.post('/ticket', function(req, res, next) {
-  var request = require('request');
-  var url = 'http://localhost:3000/api/tickets/ticketing';
-
-  request.post(url, {json: true, body: req.body}, function(err, response, body) {
-    if (!err && response.statusCode === 200) {
-      return res.redirect('/ticket?busCount', + response.busCount);
-    } else {
-      return res.redirect('/ticket');
-    }
-  });
-});
-
-router.get('/test', function(req, res, next) {
-  var arr = [1, 2, 3];
-
-  async.each(arr, function(num, callback) {
-    console.log('num : ' + num);
-
-    console.log('File processed');
-    callback();
-  }, function(err){
-    if( err ) {
-      console.log('A file failed to process');
-    } else {
-      console.log('All files have been processed successfully');
-      res.render('error');
-    }
-  });
-});
-
 module.exports = router;

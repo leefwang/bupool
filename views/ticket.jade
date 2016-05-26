@@ -1,6 +1,28 @@
 extends layout
 
 block content
+  script(type='text/javascript').
+    $(function () {
+      $('#ticketing-btn').on('click' , function () {
+        $.ajax({
+          url: '/api/tickets/ticketing',
+          method: 'POST',
+          data: {
+            eid: $("#eid").val(),
+            bcnt: $("#bcnt").val(),
+            mmembers: $("#mmembers").val()
+          },
+          dataType: 'json',
+          success: function (data) {
+            if (alert(data.busCount + "대의 버스가 생성되었습니다")) {
+            } else {
+              window.location.reload();
+            }
+          }
+        }); // $.ajax
+      });
+    });
+
   .container
     .col-sm-12
       .panel.panel-default.row
@@ -20,11 +42,11 @@ block content
               label.col-sm-2 #{item.members}
         .panel-footer
           .row.well.well-sm
-            form.form-horizontal(role='form', action="/api/tickets/ticketing", method='POST')
+            form#ticketing.form-horizontal
               .form-group
                 label.col-sm-2.control-label 이벤트 ID
                 .col-sm-2
-                  input.form-control(type='text', name='eid')
+                  input#eid.form-control(type='text', name='eid')
               .form-group
                 label.col-sm-2.control-label(for='bcnt') 버스 수
                 .col-sm-2
@@ -35,7 +57,7 @@ block content
                   input#mmembers.form-control(type='text', name='mmembers')
               if (busCount)
                 label.col-sm-2.control-label(for='mmembers') #{busCount}대의 버스가 생성되었습니다.
-              button.btn.btn-default.pull-right(type='submit') 발권
+              button#ticketing-btn.btn.btn-default.pull-right(type='button') 발권
           .row.well.well-sm
             form.form-horizontal(role='form', action="/api/tickets/reject", method='POST')
               button.btn.btn-default.pull-right(type='submit') 남은 요청 거절

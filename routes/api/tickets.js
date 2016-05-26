@@ -83,148 +83,93 @@ router.all('/ticketing', function(req, res, next) {
     }
   }).then(function (courses) {
 
-    var promises = courses.map(function (course, cb) {
-      var courseOfEvent = course;
+    var asyncJob = function(course, a) {
+      var deferred = Q.defer();
+      setTimeout(function() {
 
-      models.course_requests.sum('members', { where: { course_id: courseOfEvent.id, status: 'requested' }}).then(function(sum) {
-        if(busCount > 0 && sum > courseOfEvent.min_members - minMembersMinus) {
-          models.course_requests.findAll({
-            include: [{
-              model: models.users,
+        var courseOfEvent = course;
+
+        models.course_requests.sum('members', { where: { course_id: courseOfEvent.id, status: 'requested' }}).then(function(sum) {
+          if(busCount > 0 && sum >= courseOfEvent.min_members - minMembersMinus) {
+            models.course_requests.findAll({
               include: [{
-                model: models.devices
-              }]
-            }],
-            where: {
-              course_id: courseOfEvent.id,
-              status: 'requested'
-            },
-            order: [
-              ['udate', 'ASC']
-            ]
-          }).then(function (courseRequests) {
-            var sumMembers = 0;
+                model: models.users,
+                include: [{
+                  model: models.devices
+                }]
+              }],
+              where: {
+                course_id: courseOfEvent.id,
+                status: 'requested'
+              },
+              order: [
+                ['udate', 'ASC']
+              ]
+            }).then(function (courseRequests) {
+              var sumMembers = 0;
 
-            async.each(courseRequests, function (courseRequest) {
-              if (sumMembers + courseRequest.members <= courseOfEvent.max_members) {
-                var ticket = models.tickets.build({
-                  course_id: courseRequest.course_id,
-                  destination_id: courseRequest.destination_id,
-                  user_id: courseRequest.user_id,
-                  members: courseRequest.members
-                });
-
-                ticket.save().then(function() {
-                  models.push_messages.findOne({
-                    include: [{ all: true }],
-                    where : {
-                      scheme: '1'
-                    }
-                  }).then(function(pushMessage) {
-                    //utils.sendPush(pushMessage, courseRequest.user.devices);
+              async.each(courseRequests, function (courseRequest) {
+                if (sumMembers + courseRequest.members <= courseOfEvent.max_members) {
+                  var ticket = models.tickets.build({
+                    course_id: courseRequest.course_id,
+                    destination_id: courseRequest.destination_id,
+                    user_id: courseRequest.user_id,
+                    members: courseRequest.members
                   });
-                });
 
-                courseRequest.update({
-                  status: 'ticketed'
-                }, {fields: ['status']}).then(function() {
+                  ticket.save().then(function() {
+                    models.push_messages.findOne({
+                      include: [{ all: true }],
+                      where : {
+                        scheme: '1'
+                      }
+                    }).then(function(pushMessage) {
+                      //utils.sendPush(pushMessage, courseRequest.user.devices);
+                    });
+                  });
 
-                });
+                  courseRequest.update({
+                    status: 'ticketed'
+                  }, {fields: ['status']}).then(function() {
 
-                sumMembers += courseRequest.members;
-              }
-            }, function() {
-              cb();
+                  });
+
+                  sumMembers += courseRequest.members;
+                }
+              }, function() {
+                cb();
+              });
+
             });
 
-          });
+            busCount--;
+            console.log(busCount);
 
-          busCount--;
-          console.log(busCount);
+          }
+        });
 
-        }
+        deferred.resolve(1);
+      }, 300);
+
+      return deferred.promise;
+    };
+
+    function next(idx) {
+      if (idx > courses.length -1) { return Q(true); }
+      return asyncJob(courses[idx]).then(function(result) {
+        return next(idx+ 1);
+      });
+    }
+
+    next(0).then(function() {
+      console.log('completed');
+      console.log(req.body.bcnt - busCount);
+
+      res.json({
+        result: 1,
+        busCount: req.body.bcnt - busCount
       });
     });
-
-    // Wait for all promises to be resolved
-    Q.all(promises)
-      .then(
-        function () { // all is well!
-          cb();
-        },
-        function (err) { // something bad happened!
-          cb(err);
-        }
-      );
-
-    // async.each(courses, function (course, cb) {
-    //   var courseOfEvent = course;
-    //
-    //   models.course_requests.sum('members', { where: { course_id: courseOfEvent.id, status: 'requested' }}).then(function(sum) {
-    //     if(busCount > 0 && sum > courseOfEvent.min_members - minMembersMinus) {
-    //       models.course_requests.findAll({
-    //         include: [{
-    //           model: models.users,
-    //           include: [{
-    //             model: models.devices
-    //           }]
-    //         }],
-    //         where: {
-    //           course_id: courseOfEvent.id,
-    //           status: 'requested'
-    //         },
-    //         order: [
-    //           ['udate', 'ASC']
-    //         ]
-    //       }).then(function (courseRequests) {
-    //         var sumMembers = 0;
-    //
-    //         async.each(courseRequests, function (courseRequest) {
-    //           if (sumMembers + courseRequest.members <= courseOfEvent.max_members) {
-    //             var ticket = models.tickets.build({
-    //               course_id: courseRequest.course_id,
-    //               destination_id: courseRequest.destination_id,
-    //               user_id: courseRequest.user_id,
-    //               members: courseRequest.members
-    //             });
-    //
-    //             ticket.save().then(function() {
-    //               models.push_messages.findOne({
-    //                 include: [{ all: true }],
-    //                 where : {
-    //                   scheme: '1'
-    //                 }
-    //               }).then(function(pushMessage) {
-    //                 //utils.sendPush(pushMessage, courseRequest.user.devices);
-    //               });
-    //             });
-    //
-    //             courseRequest.update({
-    //               status: 'ticketed'
-    //             }, {fields: ['status']}).then(function() {
-    //
-    //             });
-    //
-    //             sumMembers += courseRequest.members;
-    //           }
-    //         }, function() {
-    //           cb();
-    //         });
-    //
-    //       });
-    //
-    //       busCount--;
-    //       console.log(busCount);
-    //
-    //     }
-    //   });
-    // }, function () {
-    //   console.log(busCount);
-    //   // res.json({
-    //   //   result: 1,
-    //   //   busCount: req.body.bcnt - busCount
-    //   // });
-    // });
   });
 });
 
