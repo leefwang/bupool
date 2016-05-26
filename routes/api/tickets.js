@@ -91,6 +91,8 @@ router.all('/ticketing', function(req, res, next) {
 
         models.course_requests.sum('members', { where: { course_id: courseOfEvent.id, status: 'requested' }}).then(function(sum) {
           if(busCount > 0 && sum >= courseOfEvent.min_members - minMembersMinus) {
+            busCount--;
+
             models.course_requests.findAll({
               include: [{
                 model: models.users,
@@ -99,7 +101,7 @@ router.all('/ticketing', function(req, res, next) {
                 }]
               }],
               where: {
-                course_id: courseOfEvent.id,
+                course_id: course.id,
                 status: 'requested'
               },
               order: [
@@ -141,34 +143,34 @@ router.all('/ticketing', function(req, res, next) {
               });
 
             });
-
-            busCount--;
-            console.log(busCount);
-
           }
         });
 
         deferred.resolve(1);
-      }, 100);
+      }, 80);
 
       return deferred.promise;
     };
 
     function next(idx) {
-      if (idx > courses.length -1) { return Q(true); }
-      return asyncJob(courses[idx]).then(function(result) {
-        return next(idx+ 1);
+      if (idx > courses.length -1) { return Q(true) }
+      return asyncJob(courses[idx]).then(function (result) {
+        return next(idx + 1);
       });
     }
 
     next(0).then(function() {
-      console.log('completed');
-      console.log(req.body.bcnt - busCount);
+      setTimeout(function() {
+        console.log('completed');
+        console.log("---------------------");
+        console.log(req.body.bcnt - busCount);
+        console.log("---------------------");
 
-      res.json({
-        result: 1,
-        busCount: req.body.bcnt - busCount
-      });
+        res.json({
+          result: 1,
+          busCount: req.body.bcnt - busCount
+        });
+      }, 500);
     });
   });
 });
