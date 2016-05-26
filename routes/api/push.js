@@ -11,7 +11,7 @@ router.all('/send', function(req, res, next) {
   models.push_messages.findOne({
     include: [{ all: true }],
     where : {
-      id: req.query.push_id
+      id: req.body.push_id
     }
   }).then(function (pushMessage) {
     push = pushMessage;
@@ -37,13 +37,6 @@ router.all('/send', function(req, res, next) {
           }
         }
 
-        utils.sendPush(push, devices);
-        res.redirect('/push');
-      });
-    } else {
-      models.devices.findAll({
-
-      }).then(function (devices) {
         utils.sendPush(push, devices);
         res.redirect('/push');
       });
