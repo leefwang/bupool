@@ -31,13 +31,13 @@ block content
         .panel-body
           .row
             label.col-sm-2 코스 id
-            label.col-sm-2 목적지
+            label.col-sm-4 목적지
             label.col-sm-2 핸드폰 번호
             label.col-sm-2 인원
           each item in courseRequests
             .row
               label.col-sm-2 #{item.course_id}
-              label.col-sm-2 #{item.destination.name}
+              label.col-sm-4 #{item.destination.name}
               label.col-sm-2 #{item.user.phone}
               label.col-sm-2 #{item.members}
         .panel-footer

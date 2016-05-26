@@ -31,7 +31,7 @@ router.get('/ticket', function(req, res, next) {
       status: 'requested'
     }
   }).then(function (courseRequests) {
-    res.render('ticket', {courseRequests: courseRequests, busCount: req.query.busCount});
+    res.render('ticket', {courseRequests: courseRequests});
   });
 });
 
