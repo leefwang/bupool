@@ -149,7 +149,7 @@ router.all('/ticketing', function(req, res, next) {
         });
 
         deferred.resolve(1);
-      }, 300);
+      }, 100);
 
       return deferred.promise;
     };
