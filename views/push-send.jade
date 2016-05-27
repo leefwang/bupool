@@ -35,7 +35,7 @@ block content
           each item in pushMessages
             if (item.scheme === '3')
               .row
-                form(action='/api/push/send')
+                form(action='/api/push/send', method='POST')
                   label.col-sm-2 #{item.title}
                   if (item.scheme === '3')
                     .col-sm-2
