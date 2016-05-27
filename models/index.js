@@ -4,8 +4,8 @@ var fs        = require("fs");
 var path      = require("path");
 var Sequelize = require("sequelize");
 var env       = process.env.NODE_ENV || "development";
-var sequelize = new Sequelize('bupool', 'ec2-user', '', {
-  host: '52.79.173.235',
+var sequelize = new Sequelize('bupool', 'admin', 'bupool123', {
+  host: 'bupool.c1x4cfy4uv4i.ap-northeast-2.rds.amazonaws.com',
   dialect: 'mysql',
   timezone: '+09:00',
   pool: {
